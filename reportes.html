@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Lugares Conflictivos</title>
-    <!-- Agrega el enlace a Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Contenedor de tarjetas -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="#">Reportes</a>
@@ -35,24 +33,18 @@
     </nav>
     <div class="container mt-5">
         <div class="row" id="cardContainer">
-            <!-- Aquí se generarán las tarjetas a partir de la respuesta JSON -->
         </div>
     </div>
 
-    <!-- Agrega los scripts de Bootstrap y tu código JavaScript al final del cuerpo del documento -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // URL de la API (cámbiala a tu URL local)
         const apiUrl = 'http://127.0.0.1:3000/zonas';
 
-        // Obtener el contenedor de tarjetas
         const cardContainer = document.getElementById('cardContainer');
 
-        // Realizar solicitud HTTP a la API
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
-                // Generar las tarjetas a partir de la respuesta JSON
                 data.forEach(place => {
                     const card = document.createElement('div');
                     card.classList.add('col-md-4', 'mb-4');
