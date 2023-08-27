@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportar un Nuevo Crimen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Reportar un crimen</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reportes.html">Reportes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reportar.html">Reportar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Chat</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container mt-5">
+        <form id="reportForm">
+            <div class="mb-3">
+                <label for="zonasSelect" class="form-label">Zona</label>
+                <select class="form-select" id="zonasSelect" required>
+
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="crimenInput" class="form-label">Tipo de Crimen</label>
+                <input type="text" class="form-control" id="crimenInput" required>
+            </div>
+            <div class="mb-3">
+                <label for="asesinatosInput" class="form-label">Número de Asesinatos</label>
+                <input type="number" class="form-control" id="asesinatosInput">
+            </div>
+            <button type="submit" class="btn btn-primary">Reportar Crimen</button>
+        </form>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const apiUrl = 'http://127.0.0.1:3000/zonas';
+
+        const zonasSelect = document.getElementById('zonasSelect');
+        const reportForm = document.getElementById('reportForm');
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(zonas => {
+                zonas.forEach(zona => {
+                    const option = document.createElement('option');
+                    option.value = zona.id;
+                    option.textContent = zona.nombre;
+                    zonasSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error al obtener las zonas:', error));
+
+        reportForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const zonaId = zonasSelect.value;
+            const crimen = document.getElementById('crimenInput').value;
+            const asesinatos = document.getElementById('asesinatosInput').value || 0;
+        });
+    </script>
+</body>
+</html>
