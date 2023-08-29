@@ -10,7 +10,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Reportar un crimen</a>
+            <a class="navbar-brand" href="#">Reportar</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -26,7 +26,7 @@
                         <a class="nav-link" href="/reportar.html">Reportar</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Chat</a>
+                        <a class="nav-link" href="/chat.html">Chat</a>
                     </li>
                 </ul>
             </div>
@@ -73,14 +73,46 @@
                 });
             })
             .catch(error => console.error('Error al obtener las zonas:', error));
-
-        reportForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const zonaId = zonasSelect.value;
-            const crimen = document.getElementById('crimenInput').value;
-            const asesinatos = document.getElementById('asesinatosInput').value || 0;
-        });
     </script>
+    <script>
+      
+        reportForm.addEventListener('submit', async function(event) {
+          event.preventDefault();
+      
+          const lugar = zonasSelect.options[zonasSelect.selectedIndex].textContent;
+          const id = zonasSelect.value;
+          const descripcion = document.getElementById('crimenInput').value;
+          const muertos = document.getElementById('asesinatosInput').value || 0;
+      
+          const formData = {
+            lugar: lugar,
+            descripcion: descripcion,
+            muertos: muertos
+          };
+      
+          try {
+            const response = await fetch('http://localhost:3000/reportes', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(formData)
+            });
+      
+            if (response.ok) {
+              console.log('Reporte creado exitosamente');
+                fetch(`http://localhost:3000/sumar_asesinato/${id}/${muertos}`)
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error al obtener las zonas:', error));
+                alert('Reporte creado exitosamente');
+            } else {
+              console.error('Error al crear el reporte');
+            }
+          } catch (error) {
+            console.error('Error en la solicitud:', error);
+          }
+        });
+      </script>
 </body>
 </html>

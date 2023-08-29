@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <!-- Agrega el enlace a Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Chat</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reportes.html">Reportes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reportar.html">Reportar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat.html">Chat</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">Chat</div>
+                    <div class="card-body" id="chatContainer">
+                    </div>
+                    <div class="card-footer">
+                        <form id="messageForm" class="input-group">
+                            <input type="text" id="nombreInput" class="form-control" placeholder="Tu nombre">
+                            <input type="text" id="contenidoInput" class="form-control" placeholder="Escribe tu mensaje...">
+                            <button type="submit" class="btn btn-primary">Enviar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .center-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+    </style>
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageForm = document.getElementById('messageForm');
+        const nombreInput = document.getElementById('nombreInput');
+        const contenidoInput = document.getElementById('contenidoInput');
+        
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.classList.add('alert', `alert-${type}`, 'center-alert');
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 1000); 
+        }
+        async function obtenerComentarios() {
+            try {
+                const response = await fetch('http://localhost:3000/comentarios');
+                const comentarios = await response.json();
+
+                chatContainer.innerHTML = '';
+
+                comentarios.forEach(comentario => {
+                    const message = document.createElement('div');
+                    message.classList.add('mb-2', 'p-2', 'border', 'rounded', 'bg-light', 'd-flex', 'justify-content-between');
+                    const fecha = new Date(comentario.created_at);
+                    const hora = fecha.toLocaleTimeString('es-ES');
+                    message.innerHTML = `
+                        <div>
+                            <p><strong>${comentario.nombre}</strong> - ${hora}</p>
+                            <p>${comentario.contenido}</p>
+                        </div>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarComentario(${comentario.id})">Eliminar</button>
+                    `;
+                    chatContainer.appendChild(message);
+                });
+            } catch (error) {
+                console.error('Error al obtener comentarios:', error);
+            }
+        }
+
+        async function enviarMensaje() {
+            const nombre = nombreInput.value;
+            const contenido = contenidoInput.value;
+
+            if (nombre && contenido) {
+                const formData = {
+                    nombre: nombre,
+                    contenido: contenido
+                };
+
+                try {
+                    const response = await fetch('http://localhost:3000/comentarios', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        nombreInput.value = '';
+                        contenidoInput.value = '';
+                        obtenerComentarios();
+                        showAlert('Mensaje enviado correctamente', 'success');
+                    } else {
+                        console.error('Error al enviar el mensaje');
+                        showAlert('Error al enviar el mensaje', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Error en la solicitud:', error);
+                    showAlert('Error en la solicitud', 'danger');
+                }
+            }
+        }
+
+        async function eliminarComentario(id) {
+            try {
+                const response = await fetch(`http://localhost:3000/comentarios/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    obtenerComentarios();
+                    showAlert('Comentario eliminado correctamente', 'success');
+                } else {
+                    console.error('Error al eliminar el comentario');
+                    showAlert('Error al eliminar el comentario', 'danger');
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                showAlert('Error en la solicitud', 'danger');
+            }
+        }
+
+        messageForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            enviarMensaje();
+        });
+
+        obtenerComentarios();
+    </script>
+</body>
+</html>
