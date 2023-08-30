@@ -57,7 +57,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const apiUrl = 'http://127.0.0.1:3000/zonas';
+        const apiUrl = 'http://142.93.190.221:3000/zonas';
 
         const zonasSelect = document.getElementById('zonasSelect');
         const reportForm = document.getElementById('reportForm');
@@ -91,7 +91,7 @@
           };
       
           try {
-            const response = await fetch('http://localhost:3000/reportes', {
+            const response = await fetch('http://142.93.190.221:3000/reportes', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -101,7 +101,7 @@
       
             if (response.ok) {
               console.log('Reporte creado exitosamente');
-                fetch(`http://localhost:3000/sumar_asesinato/${id}/${muertos}`)
+                fetch(`http://142.93.190.221:3000/sumar_asesinato/${id}/${muertos}`)
                 .then(response => response.json())
                 .then(data => console.log(data))
                 .catch(error => console.error('Error al obtener las zonas:', error));
