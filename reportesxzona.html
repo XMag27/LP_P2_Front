@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes por Zona</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Reportes</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reportes.html">Reportes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reportar.html">Reportar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat.html">Chat</a>
+                    </li>
+                    <li class="nav-item"> 
+                        <a class="nav-link" href="/reportesxzona.html">Reportes por zona</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">Seleccionar Zona</div>
+                    <div class="card-body">
+                        <form id="seleccionarZonaForm">
+                            <div class="mb-3">
+                                <label for="zonaSelect" class="form-label">Zona</label>
+                                <select class="form-select" id="zonaSelect" required>
+                                    <option value="" disabled selected>Selecciona una zona</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Mostrar Reportes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">Reportes por Zona</div>
+                    <div class="card-body" id="reportesContainer">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const zonaSelect = document.getElementById('zonaSelect');
+        const seleccionarZonaForm = document.getElementById('seleccionarZonaForm');
+        const reportesContainer = document.getElementById('reportesContainer');
+
+        async function obtenerZonas() {
+            try {
+                const response = await fetch('http://localhost:3000/zonas');
+                const zonas = await response.json();
+
+                zonaSelect.innerHTML = '<option value="" disabled selected>Selecciona una zona</option>';
+
+                zonas.forEach(zona => {
+                    const option = document.createElement('option');
+                    option.value = zona.nombre;
+                    option.textContent = zona.nombre;
+                    zonaSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error al obtener zonas:', error);
+            }
+        }
+
+        async function obtenerReportesPorZona(zonaId) {
+            try {
+                const response = await fetch(`http://localhost:3000/reportes`);
+                const reportes = await response.json();
+
+                reportesContainer.innerHTML = '';
+
+                reportes.forEach(reporte => {
+                    if(reporte.lugar == zonaId){
+                        const reporteCard = document.createElement('div');
+                        reporteCard.classList.add('card', 'mb-3');
+                        reporteCard.innerHTML = `
+                            <div class="card-body">
+                                <h5 class="card-title">${reporte.descripcion}</h5>
+                                <p class="card-text">Muertos: ${reporte.muertos}</p>
+                                <p class="card-text">Lugar: ${reporte.lugar}</p>
+                            </div>
+                        `;
+                        reportesContainer.appendChild(reporteCard);
+                    }
+                    
+
+                });
+            } catch (error) {
+                console.error('Error al obtener reportes:', error);
+            }
+        }
+
+        seleccionarZonaForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const selectedZonaId = zonaSelect.value;
+            if (selectedZonaId) {
+                obtenerReportesPorZona(selectedZonaId);
+            }
+        });
+
+        obtenerZonas();
+    </script>
+</body>
+</html>
